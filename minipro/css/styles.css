@@ -1,0 +1,93 @@
+/* Reset and global styles */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4; /* Light gray background */
+    color: #333; /* Dark gray text color */
+    line-height: 1.6;
+}
+
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Header styles */
+header {
+    background-color: #004085; /* Dark blue background */
+    color: #ffffff; /* White text color */
+    padding: 20px 0;
+    text-align: center;
+}
+
+header h1 {
+    margin: 0;
+}
+
+/* Navigation styles */
+.nav-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    background-color: #007bff; /* Primary color */
+    border-radius: 5px;
+}
+
+.nav-links li {
+    margin: 0;
+}
+
+.nav-links li a {
+    display: block;
+    padding: 15px 25px;
+    color: #ffffff; /* White text color */
+    text-decoration: none;
+    transition: background-color 0.3s;
+}
+
+.nav-links li a:hover {
+    background-color: #0056b3; /* Darker shade for hover effect */
+}
+
+/* Main content area */
+.main-content {
+    background-color: #ffffff; /* White background */
+    padding: 20px;
+    margin-top: 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Light shadow */
+}
+
+/* Footer styles */
+footer {
+    background-color: #343a40; /* Dark background */
+    color: #ffffff; /* White text color */
+    padding: 10px 0;
+    text-align: center;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .nav-links {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .nav-links li {
+        text-align: center;
+    }
+    .nav-links li a {
+        padding: 12px 20px;
+    }
+}
