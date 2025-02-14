@@ -1,8 +1,8 @@
 <?php
-$host = "localhost";
-$dbname = "lost_and_found";
-$username = "root";
-$password = "123456";
+$host = getenv("DB_HOST");
+$dbname = getenv("DB_NAME");
+$username = getenv("DB_USER");
+$password = getenv("DB_PASSWORD");
 
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $username, $password, [
