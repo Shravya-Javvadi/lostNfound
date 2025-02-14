@@ -10,13 +10,13 @@ if (!isset($_SESSION['user_id'])) {
 $user_id = $_SESSION['user_id'];
 
 // Fetch deleted lost items posted by the user
-$lost_items_query = $conn->prepare("SELECT item_name, description, image, contact_number, reg_number FROM lost_item WHERE user_id = :user_id AND is_deleted = 1");
+$lost_items_query = $pdo->prepare("SELECT item_name, description, image, contact_number, reg_number FROM lost_item WHERE user_id = :user_id AND is_deleted = 1");
 $lost_items_query->bindParam(':user_id', $user_id);
 $lost_items_query->execute();
 $lost_items = $lost_items_query->fetchAll(PDO::FETCH_ASSOC);
 
 // Fetch deleted found items posted by the user
-$found_items_query = $conn->prepare("SELECT item_name, description, image, contact_number, reg_number FROM found_item WHERE user_id = :user_id AND is_deleted = 1");
+$found_items_query = $pdo->prepare("SELECT item_name, description, image, contact_number, reg_number FROM found_item WHERE user_id = :user_id AND is_deleted = 1");
 $found_items_query->bindParam(':user_id', $user_id);
 $found_items_query->execute();
 $found_items = $found_items_query->fetchAll(PDO::FETCH_ASSOC);

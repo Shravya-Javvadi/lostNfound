@@ -21,7 +21,7 @@ function isValidDescription($description) {
 }
 
 function isValidContactNumber($contact_number) {
-    return preg_match('/^[9876]\d{9}$/', $contact_number);
+    return preg_match('/^\+91[6789]\d{9}$/', $contact_number);
 }
 
 function isValidRegNumber($reg_number) {
@@ -32,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $user_id = $_SESSION['user_id'];
     $item_name = trim($_POST['item_name']);
     $description = trim($_POST['description']);
-    $contact_number = trim($_POST['contact_number']);
+    $contact_number = '+91' . trim($_POST['contact_number']);
     $reg_number = trim($_POST['reg_number']);
     $image = '';
 
@@ -46,7 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 
     if (empty($contact_number) || !isValidContactNumber($contact_number)) {
-        $errors[] = "Contact number is required and should start with 9, 8, 7, or 6 and be 10 digits long.";
+        $errors[] = "Contact number is required and should be in the format +91XXXXXXXXXX.";
     }
 
     if (empty($reg_number) || !isValidRegNumber($reg_number)) {
@@ -66,22 +66,43 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 
     if (empty($errors)) {
-        $stmt = $conn->prepare("INSERT INTO lost_item (user_id, item_name, description, image, contact_number, reg_number, post_date) VALUES (:user_id, :item_name, :description, :image, :contact_number, :reg_number, NOW())");
-        $stmt->bindParam(':user_id', $user_id);
-        $stmt->bindParam(':item_name', $item_name);
-        $stmt->bindParam(':description', $description);
-        $stmt->bindParam(':image', $image);
-        $stmt->bindParam(':contact_number', $contact_number);
-        $stmt->bindParam(':reg_number', $reg_number);
-
-        if ($stmt->execute()) {
-            $success = true;
+        $stmt = $pdo->prepare("INSERT INTO lost_item (user_id, item_name, description, image, contact_number, reg_number, post_date) 
+                                VALUES (:user_id, :item_name, :description, :image, :contact_number, :reg_number, NOW())");
+    
+        $stmt->execute([
+            ':user_id' => $user_id,
+            ':item_name' => $item_name,
+            ':description' => $description,
+            ':image' => $image,
+            ':contact_number' => $contact_number,
+            ':reg_number' => $reg_number
+        ]);
+    
+        if ($stmt) {
+            // Notify other users about the new lost item
+            $message = "A new lost item has been posted: $item_name";
+    
+            $notif_stmt = $pdo->prepare("INSERT INTO notifications (user_id, message) VALUES (:user_id, :message)");
+            
+            // Fetch all users except the one who posted
+            $users_stmt = $pdo->prepare("SELECT id FROM users WHERE id != :current_user");
+            $users_stmt->execute([':current_user' => $user_id]);
+            $users_result = $users_stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+            foreach ($users_result as $row) {
+                $notif_stmt->execute([
+                    ':user_id' => $row['id'],
+                    ':message' => $message
+                ]);
+            }
+    
             header('Location: ' . $_SERVER['PHP_SELF'] . '?success=1');
             exit();
         } else {
-            $errors[] = "Error: " . $stmt->errorInfo()[2];
+            $errors[] = "Error: " . implode(", ", $stmt->errorInfo());
         }
     }
+    
 }
 ?>
 

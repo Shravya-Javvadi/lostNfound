@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -192,6 +194,27 @@
         }
     </style>
 </head>
+<script>
+function showToast(message) {
+    document.querySelector(".toast-body").innerText = message;
+    let toast = new bootstrap.Toast(document.getElementById('notificationToast'));
+    toast.show();
+}
+
+function fetchNotifications() {
+    fetch('fetch_notifications.php')
+    .then(response => response.json())
+    .then(data => {
+        data.forEach(notification => {
+            showToast(notification.message);
+        });
+    });
+}
+
+// Fetch notifications every 10 seconds
+setInterval(fetchNotifications, 10000);
+</script>
+
 <body>
     <header>
         <a href="index.php">
@@ -202,6 +225,19 @@
             <button onclick="window.location.href='logout.php'" class="logout-button">Logout</button>
         </div>
     </header>
+    <!-- Notification Toast -->
+<div aria-live="polite" aria-atomic="true" class="position-fixed bottom-0 end-0 p-3" style="z-index: 5">
+    <div id="notificationToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header">
+            <strong class="me-auto">Notification</strong>
+            <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="toast-body"></div>
+    </div>
+</div>
+
     <div class="container">
         <aside class="sidebar">
             <h2>Menu</h2>

@@ -1,3 +1,58 @@
+<?php
+session_start();
+$errors = [];
+
+// Database connection (Replace with your credentials)
+$conn = new mysqli("localhost", "root", "123456", "lost_and_found");
+
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Handle form submission
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $username = trim($_POST["username"]);
+    $password = $_POST["password"];
+    $confirm_password = $_POST["confirm_password"];
+
+    // Validate inputs
+    if (empty($username) || empty($password) || empty($confirm_password)) {
+        $errors[] = "All fields are required.";
+    }
+    if ($password !== $confirm_password) {
+        $errors[] = "Passwords do not match.";
+    }
+
+    // Check if username already exists
+    $stmt = $conn->prepare("SELECT id FROM users WHERE username = ?");
+    $stmt->bind_param("s", $username);
+    $stmt->execute();
+    $stmt->store_result();
+    if ($stmt->num_rows > 0) {
+        $errors[] = "Username is already taken.";
+    }
+    $stmt->close();
+
+    // If no errors, insert user into database
+    if (empty($errors)) {
+        $hashed_password = password_hash($password, PASSWORD_BCRYPT);
+        $stmt = $conn->prepare("INSERT INTO users (username, password) VALUES (?, ?)");
+        $stmt->bind_param("ss", $username, $hashed_password);
+        if ($stmt->execute()) {
+            $_SESSION['success'] = "Registration successful! You can now log in.";
+            header("Location: index.php");
+            exit();
+        } else {
+            $errors[] = "Error registering user.";
+        }
+        $stmt->close();
+    }
+}
+
+$conn->close();
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -136,6 +191,7 @@
         <div class="container d-flex justify-content-center align-items-center">
             <img src="logo.gif" alt="Logo"> <!-- Replace with the path to your logo -->
             <h1>Lost'N'Found</h1>
+            <button type="button" onclick="window.location.href='dashboard.php';">Back</button>
         </div>
     </header>
 

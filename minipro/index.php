@@ -2,26 +2,32 @@
 session_start();
 include 'config.php'; // Assuming this file contains your database connection
 
-// Check if the form is submitted
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    include 'config.php';
+
     $username = $_POST['username'];
     $password = $_POST['password'];
 
-    // Prepare SQL statement to retrieve user information
-    $stmt = $conn->prepare("SELECT id, username, password FROM users WHERE username = :username");
+    // Fetch user details from the database
+    $stmt = $pdo->prepare("SELECT id, username, password FROM users WHERE username = :username");
     $stmt->bindParam(':username', $username);
     $stmt->execute();
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    // Verify user and password
-    if ($user && password_verify($password, $user['password'])) {
-        $_SESSION['user_id'] = $user['id'];
-        header('Location: dashboard.php'); // Redirect to dashboard or any secure page
-        exit();
+    if ($user) {
+        // Verify the hashed password
+        if (password_verify($password, $user['password'])) {
+            $_SESSION['user_id'] = $user['id'];
+            header("Location: dashboard.php");
+            exit();
+        } else {
+            $error = '<div class="alert alert-danger" role="alert">Invalid credentials! Please try again.</div>';
+        }
     } else {
-        $error = '<div class="alert alert-danger" role="alert">Invalid credentials!</div>';
+        $error = '<div class="alert alert-danger" role="alert">Invalid credentials! Please try again.</div>';
     }
 }
+
 ?>
 
 <!DOCTYPE html>

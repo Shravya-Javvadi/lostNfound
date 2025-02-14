@@ -2,32 +2,39 @@
 session_start();
 require_once 'db.php';
 
-// Check if item_id and item_type are set
 if (isset($_POST['item_id']) && isset($_POST['item_type'])) {
-    $item_id = $_POST['item_id'];
+    $item_id = filter_var($_POST['item_id'], FILTER_VALIDATE_INT);
     $item_type = $_POST['item_type'];
 
-    // Determine the table based on the item type
-    if ($item_type === 'lost') {
-        $table = 'lost_item';
-    } elseif ($item_type === 'found') {
-        $table = 'found_item';
-    } else {
-        // Invalid item type
-        header("Location: search_items.php");
+    if (!$item_id) {
+        // Invalid ID
+        header("Location: search_items.php?error=invalid_id");
         exit();
     }
 
-    // Update the is_deleted column to 1
-    $stmt = $pdo->prepare("UPDATE $table SET is_deleted = 1 WHERE id = ?");
-    $stmt->execute([$item_id]);
+    // Determine the table based on item type
+    $valid_tables = ['lost' => 'lost_item', 'found' => 'found_item'];
+    
+    if (!array_key_exists($item_type, $valid_tables)) {
+        header("Location: search_items.php?error=invalid_type");
+        exit();
+    }
 
-    // Redirect back to the search items page
-    header("Location: search_items.php");
+    $table = $valid_tables[$item_type];
+
+    // Update the is_deleted column to 1 securely
+    $stmt = $pdo->prepare("UPDATE $table SET is_deleted = 1 WHERE id = :id");
+    $stmt->bindParam(':id', $item_id, PDO::PARAM_INT);
+    $stmt->execute();
+
+    if ($stmt->rowCount() > 0) {
+        header("Location: search_items.php?success=deleted");
+    } else {
+        header("Location: search_items.php?error=not_found");
+    }
     exit();
 } else {
-    // Redirect back if item_id or item_type is not set
-    header("Location: search_items.php");
+    header("Location: search_items.php?error=missing_params");
     exit();
 }
 ?>

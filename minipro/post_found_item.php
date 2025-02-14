@@ -4,6 +4,7 @@ ini_set('display_errors', 1);
 session_start();
 require 'config.php';
 
+
 if (!isset($_SESSION['user_id'])) {
     header('Location: login.php');
     exit();
@@ -21,7 +22,7 @@ function isValidDescription($description) {
 }
 
 function isValidContactNumber($contact_number) {
-    return preg_match('/^[9876]\d{9}$/', $contact_number);
+    return preg_match('/^\+91[6789]\d{9}$/', $contact_number);
 }
 
 function isValidRegNumber($reg_number) {
@@ -32,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $user_id = $_SESSION['user_id'];
     $item_name = trim($_POST['item_name']);
     $description = trim($_POST['description']);
-    $contact_number = trim($_POST['contact_number']);
+    $contact_number = '+91' . trim($_POST['contact_number']);
     $reg_number = trim($_POST['reg_number']);
     $image = '';
 
@@ -46,9 +47,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 
     if (empty($contact_number) || !isValidContactNumber($contact_number)) {
-        $errors[] = "Contact number is required and should start with 9, 8, 7, or 6 and be 10 digits long.";
+        $errors[] = "Contact number is required and should be in the format +91XXXXXXXXXX.";
     }
-
     if (empty($reg_number) || !isValidRegNumber($reg_number)) {
         $errors[] = "Registration number is required, should be exactly 10 characters long, and contain only numbers and alphabets.";
     }
@@ -66,7 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 
     if (empty($errors)) {
-        $stmt = $conn->prepare("INSERT INTO found_item (user_id, item_name, description, image, contact_number, reg_number, post_date) VALUES (:user_id, :item_name, :description, :image, :contact_number, :reg_number, NOW())");
+        $stmt = $pdo->prepare("INSERT INTO found_item (user_id, item_name, description, image, contact_number, reg_number, post_date) VALUES (:user_id, :item_name, :description, :image, :contact_number, :reg_number, NOW())");
         $stmt->bindParam(':user_id', $user_id);
         $stmt->bindParam(':item_name', $item_name);
         $stmt->bindParam(':description', $description);
@@ -205,8 +205,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <input type="text" name="item_name" required value="<?php echo isset($_POST['item_name']) ? htmlspecialchars($_POST['item_name']) : ''; ?>">
             <label>Description:</label>
             <textarea name="description" required><?php echo isset($_POST['description']) ? htmlspecialchars($_POST['description']) : ''; ?></textarea>
-            <label>Contact Number:</label>
-            <input type="text" name="contact_number" required value="<?php echo isset($_POST['contact_number']) ? htmlspecialchars($_POST['contact_number']) : ''; ?>">
+            <label>Contact Number (+91 included automatically):</label>
+            <input type="text" name="contact_number" pattern="[6789][0-9]{9}" title="Enter a 10-digit number starting with 6, 7, 8, or 9" required value="<?php echo isset($_POST['contact_number']) ? htmlspecialchars($_POST['contact_number']) : ''; ?>">
             <label>Registration Number:</label>
             <input type="text" name="reg_number" required value="<?php echo isset($_POST['reg_number']) ? htmlspecialchars($_POST['reg_number']) : ''; ?>">
             <label>Image:</label>

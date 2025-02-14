@@ -18,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $confirm_password = $_POST['confirm_password'];
 
     // Fetch the current hashed password from the database
-    $query = $conn->prepare('SELECT password FROM users WHERE id = ?');
+    $query = $pdo->prepare('SELECT password FROM users WHERE id = ?');
     $query->execute([$user_id]);
     $user = $query->fetch(PDO::FETCH_ASSOC);
 

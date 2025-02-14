@@ -12,7 +12,7 @@ require_once 'config.php'; // Include your database connection file
 $user_id = $_SESSION['user_id'];
 
 // Fetch the current user details from the database
-$query = $conn->prepare('SELECT username, email, profile_picture FROM users WHERE id = ?');
+$query = $pdo->prepare('SELECT username, email, profile_picture FROM users WHERE id = ?');
 $query->execute([$user_id]);
 $user = $query->fetch(PDO::FETCH_ASSOC);
 
@@ -29,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $profile_picture = $target_file;
     }
 
-    $update_query = $conn->prepare('UPDATE users SET username = ?, email = ?, profile_picture = ? WHERE id = ?');
+    $update_query = $pdo->prepare('UPDATE users SET username = ?, email = ?, profile_picture = ? WHERE id = ?');
     if ($update_query->execute([$username, $email, $profile_picture, $user_id])) {
         $_SESSION['message'] = 'Profile updated successfully!';
         header('Location: update_profile.php');

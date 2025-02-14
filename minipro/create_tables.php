@@ -1,7 +1,7 @@
 <?php
 $servername = "localhost";
 $username = "root";
-$password = "Prav@2825";
+$password = "123456";
 $dbname = "lost_and_found";
 
 try {

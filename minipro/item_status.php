@@ -10,13 +10,13 @@ if (!isset($_SESSION['user_id'])) {
 $user_id = $_SESSION['user_id'];
 
 // Fetch lost items
-$lost_items_stmt = $conn->prepare("SELECT *, CASE WHEN is_deleted = 1 THEN 'completed' ELSE 'pending' END AS status FROM lost_item WHERE user_id = :user_id");
+$lost_items_stmt = $pdo->prepare("SELECT *, CASE WHEN is_deleted = 1 THEN 'completed' ELSE 'pending' END AS status FROM lost_item WHERE user_id = :user_id");
 $lost_items_stmt->bindParam(':user_id', $user_id);
 $lost_items_stmt->execute();
 $lost_items = $lost_items_stmt->fetchAll(PDO::FETCH_ASSOC);
 
 // Fetch found items
-$found_items_stmt = $conn->prepare("SELECT *, CASE WHEN is_deleted = 1 THEN 'completed' ELSE 'pending' END AS status FROM found_item WHERE user_id = :user_id");
+$found_items_stmt = $pdo->prepare("SELECT *, CASE WHEN is_deleted = 1 THEN 'completed' ELSE 'pending' END AS status FROM found_item WHERE user_id = :user_id");
 $found_items_stmt->bindParam(':user_id', $user_id);
 $found_items_stmt->execute();
 $found_items = $found_items_stmt->fetchAll(PDO::FETCH_ASSOC);

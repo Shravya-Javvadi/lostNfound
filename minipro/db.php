@@ -2,7 +2,7 @@
 $host = 'localhost';
 $db   = 'lost_and_found';
 $user = 'root';
-$pass = 'Prav@2825';
+$pass = '123456';
 $charset = 'utf8mb4';
 
 $dsn = "mysql:host=$host;dbname=$db;charset=$charset";
